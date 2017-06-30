@@ -56,7 +56,7 @@ typedef enum{
 
 
 //funcoes:
-Disco* disco_criar(char* nome, unsigned long tamanho);
+Disco* disco_cria(char* nome, unsigned long tamanho);
 TipoRetorno disco_grava(Disco* d, char* nomeArquivo); ///nome arquivo deve conter o caminho absoluto ou relativo do arquivo
 TipoRetorno disco_remove(Disco* d, char* nome); ///somente o nome do arquivo sem o caminho
 TipoRetorno disco_recupera(Disco* d, char* nome, FILE* arquivoFisico);
@@ -167,12 +167,11 @@ unsigned long Tamanho_axrquivo(char* nomeArquivo) {
   return  tamArquivo; /// recebe nome do arquivo e retorna seu tamanho
 }
 
+Disco* disco_cria(char* nome, unsigned long tamanho){
+       Disco* d = (Disco*) malloc(sizeof(Disco*));
 
-TipoRetorno disco_criar(char* nome, unsigned long tamanho){
-       Disco* d = (Disco*) malloc(sizeof(Disco));
-
-           memcpy(d->nome, nome, sizeof(*nome));
-           int* disco[tamanho] = {NULL};
+           memcpy(d->nome, nome, sizeof(nome));
+           int disco [tamanho] = {NULL};
            d->disco* = disco[tamanho];
            d->tamDisco = tamanho;
            d->espacoLivre = tamanho;
@@ -193,7 +192,7 @@ TipoRetorno disco_criar(char* nome, unsigned long tamanho){
 
 
         NoSetor* sentinela_setor = malloc(sizeof(NoSetor));
-         sentine zla_setor->ant = NULL;
+         sentinela_setor->ant = NULL;
          sentinela_setor->prox = NULL;
          sentinela_setor->fim = NULL;
          sentinela_setor->inicio = NULL;
