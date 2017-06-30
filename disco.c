@@ -7,16 +7,16 @@
 ///PARTE 1- TAD setor;
 
  typedef struct nosetor {
-    unsigned long inicio; // O tamanho da memória é sempre positivo, entao usamos o unsigned;
+    unsigned long inicio; // O tamanho da memÃ³ria Ã© sempre positivo, entao usamos o unsigned;
     unsigned long fim;
-     struct nosetor* prox;
-     struct nosetor* ant;
+Â Â Â Â  struct nosetor* prox;
+Â Â Â Â  struct nosetor* ant;
 }NoSetor;
 //funcoes   :
-NoSetor* valorsetor();//valor que indica o proximo e anterior da seqüência de dados, utulizado sentinela
-void inserirNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//o campo nessa funçao insere o elemeno no inicio e no fim.
-void editarNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//funçao para editar o começo e o fim.
-void excluirNoSetor(NoSetor* campos); //funçao para excluir, auxiliar é uzada para excluir anterior e o proximo
+NoSetor* valorsetor();//valor que indica o proximo e anterior da seqÃ¼Ãªncia de dados, utulizado sentinela
+void inserirNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//o campo nessa funÃ§ao insere o elemeno no inicio e no fim.
+void editarNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//funÃ§ao para editar o comeÃ§o e o fim.
+void excluirNoSetor(NoSetor* campos); //funÃ§ao para excluir, auxiliar Ã© uzada para excluir anterior e o proximo
 
 
  /// PARTE 2 -  TAD ARQUIVO
@@ -34,16 +34,16 @@ void NoArquivo_adiciona (NoArquivo* Arquivo, char* Nome, unsigned long tam);
 NoArquivo* NoArquivo_procura(NoArquivo* Arquivo, char* Nome);
 void NoArquivo_apaga(NoArquivo* Arquivo);
 
- ///Parte 3 - TAD disco e TIPO RETORNO
+Â ///Parte 3 - TAD disco e TIPO RETORNO
 typedef struct{
-    char nome[40];
-    void* disco;
-    NoSetor* livres;
-    NoArquivo* arquivos;
-    unsigned long tamDisco;
-    unsigned long espacoLivre;
-    unsigned long espacoOcupado;
-    unsigned long qtdeArquivos;   
+Â Â Â Â char nome[40];
+Â Â Â Â void* disco;
+Â Â Â Â NoSetor* livres;
+Â Â Â Â NoArquivo* arquivos;
+Â Â Â Â unsigned long tamDisco;
+Â Â Â Â unsigned long espacoLivre;
+Â Â Â Â unsigned long espacoOcupado;
+Â Â Â Â unsigned long qtdeArquivos;Â Â Â 
 }Disco;
 
 //funcoes   :
@@ -52,17 +52,17 @@ Disco * insereNoSetor(NoSetor* no, Disco* d, int posicao);
 Disco * insereNoArquivo(NoArquivo* noarq, Disco* d, int posicao); ///falta esssa tambem
 TipoRetorno disco_grava(Disco* d, char* arquivo); ///falta essa que recebe o nome do arquivo e atraves do nome busca e grava e mostra se foi possivel
 
- 
+Â 
 typedef enum{
-    SUCESSO = 0,
-    ESPACO_INSUFICIENTE,
-    ARQUIVO_INEXISTENTE
+Â Â Â Â SUCESSO = 0,
+Â Â Â Â ESPACO_INSUFICIENTE,
+Â Â Â Â ARQUIVO_INEXISTENTE
 }TipoRetorno;
 
 //funcoes
 
 
- ///Implementação da TAD ARQUIVO
+ ///ImplementaÃ§Ã£o da TAD ARQUIVO
 NoArquivo* NoArquivo_cria (){
 
 	NoArquivo* A = (NoArquivo*) malloc (sizeof(NoArquivo)) ;
@@ -109,7 +109,7 @@ void NoArquivo_apaga(NoArquivo* Arquivo){
  }
 
 
-///Implementação do TAD SETORES COM FUNCOES INSERIR EDITAR E EXCLUIR E CONSULTAR CONTEUDO DO SETOR
+///ImplementaÃ§Ã£o do TAD SETORES COM FUNCOES INSERIR EDITAR E EXCLUIR E CONSULTAR CONTEUDO DO SETOR
 
 
 NoSetor* valorsetor()
@@ -259,7 +259,8 @@ Disco * insereNoArquivo(NoArquivo* noarq, Disco* d, int posicao){
          no->ant = *d->livres;
          *d->livres->ant = no->prox;
          no->prox = *d->livres->ant;
-         }
+         } 
+//Observacao: o disco esta com quase todas das 3 TAD (SETOR, ARQUIVO, DISCO E RETORNO) implementadas faltam apenas os testes de 2 funcoes de disco e tipo de retorno  e tbm uma interface. 
 
 //fazer funcao para escrever em um arquivo, usar as funcoes de abrir o arquivo e fputs(string* s, FILE* F); para escrever uma string com espaco e depois gravar ela no disco,
 // ou gravar em binario no arquivo
