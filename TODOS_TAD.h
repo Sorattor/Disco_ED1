@@ -9,17 +9,18 @@
  typedef struct nosetor {
     unsigned long inicio; // O tamanho da memória é sempre positivo, entao usamos o unsigned;
     unsigned long fim;
-     struct nosetor* prox;
-     struct nosetor* ant;
+     struct nosetor* prox;
+     struct nosetor* ant;
 }NoSetor;
 //funcoes   :
-NoSetor* valorsetor();//valor que indica o proximo e anterior da seqüência de dados, utulizado sentinela
-void inserirNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//o campo nessa funçao insere o elemeno no inicio e no fim.
-void editarNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//funçao para editar o começo e o fim.
-void excluirNoSetor(NoSetor* campos); //funçao para excluir, auxiliar é uzada para excluir anterior e o proximo
+NoSetor* criar_NoSetor();//valor que indica o proximo e anterior da seqüência de dados, utulizado sentinela
+void adicionar_NoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//o campo nessa funçao insere o elemeno no inicio e no fim.
+void editar_NoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//funçao para editar o começo e o fim.
+void apagar_NoSetor(NoSetor* campos); //funçao para excluir, auxiliar é uzada para excluir anterior e o proximo
 
 
  /// PARTE 2 -  TAD ARQUIVO
+
 typedef struct noarquivo{
     char nome[40];
     unsigned long tam;
@@ -34,37 +35,40 @@ void NoArquivo_adiciona (NoArquivo* Arquivo, char* Nome, unsigned long tam);
 NoArquivo* NoArquivo_procura(NoArquivo* Arquivo, char* Nome);
 void NoArquivo_apaga(NoArquivo* Arquivo);
 
- ///Parte 3 - TAD disco e TIPO RETORNO
+ ///Parte 3 - TAD disco e TIPO RETORNO
+
 typedef struct{
-    char nome[40];
-    void* disco;
-    NoSetor* livres;
-    NoArquivo* arquivos;
-    unsigned long tamDisco;
-    unsigned long espacoLivre;
-    unsigned long espacoOcupado;
-    unsigned long qtdeArquivos;   
+    char nome[40];
+    void* disco;
+    NoSetor* livres;
+    NoArquivo* arquivos;
+    unsigned long tamDisco;
+    unsigned long espacoLivre;
+    unsigned long espacoOcupado;
+    unsigned long qtdeArquivos;
 }Disco;
 
-//funcoes   :
+//funcoes:
 Disco* disco_cria(char* nome, unsigned long tamanho);
 TipoRetorno disco_grava(Disco* d, char* nomeArquivo); ///nome arquivo deve conter o caminho absoluto ou relativo do arquivo
 TipoRetorno disco_remove(Disco* d, char* nome); ///somente o nome do arquivo sem o caminho
 TipoRetorno disco_recupera(Disco* d, char* nome, FILE* arquivoFisico);
 unsigned long Tamanho_arquivo(char *nomeArquivo);
+
  ///falta essa que recebe o nome do arquivo e atraves do nome busca e grava e mostra se foi possivel
 
- 
+
 typedef enum{
-    SUCESSO = 0,
-    ESPACO_INSUFICIENTE,
-    ARQUIVO_INEXISTENTE
+    SUCESSO = 0,
+    ESPACO_INSUFICIENTE,
+    ARQUIVO_INEXISTENTE
 }TipoRetorno;
 
 
 
 
  ///Implementação da TAD ARQUIVO
+
 NoArquivo* NoArquivo_cria (){
 
 	NoArquivo* A = (NoArquivo*) malloc (sizeof(NoArquivo)) ;
@@ -114,7 +118,7 @@ void NoArquivo_apaga(NoArquivo* Arquivo){
 ///Implementação do TAD SETORES COM FUNCOES INSERIR EDITAR E EXCLUIR E CONSULTAR CONTEUDO DO SETOR
 
 
-NoSetor* valorsetor()
+NoSetor* criar_NoSetor()
    {
 	NoSetor* valor=(NoSetor*)malloc(sizeof(NoSetor));
 	valor->prox=valor;
@@ -122,7 +126,7 @@ NoSetor* valorsetor()
 	return valor;
    }
 
-void inserirNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim)
+void adicionar_NoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim)
    {
   NoSetor *comeco=(NoSetor*)malloc(sizeof(NoSetor));
   comeco->inicio=inicio ;
@@ -133,12 +137,12 @@ void inserirNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim)
   campos->prox=comeco;
    }
 
-void editarNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim)
+void editar_NoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim)
     {
   campos->prox->inicio = inicio ;
   campos->prox->fim = fim ;
     }
-void excluirNoSetor(NoSetor* campos)
+void apagar_NoSetor(NoSetor* campos)
     {
   campos->prox->prox->ant = campos->prox->ant;
   campos->prox = campos->prox->prox;
@@ -388,9 +392,3 @@ Disco * insereNoArquivo(NoArquivo* noarq, Disco* d, int posicao){
          *d->livres->ant = no->prox;
          no->prox = *d->livres->ant;
 }
-
-
-
-
-
-
