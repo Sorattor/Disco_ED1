@@ -47,9 +47,16 @@ typedef struct{
     unsigned long espacoOcupado;
     unsigned long qtdeArquivos;
 }Disco;
+typedef enum{
+    SUCESSO = 0,
+    ESPACO_INSUFICIENTE,
+    ARQUIVO_INEXISTENTE
+}TipoRetorno;
+
+
 
 //funcoes:
-Disco* disco_cria(char* nome, unsigned long tamanho);
+Disco* disco_criar(char* nome, unsigned long tamanho);
 TipoRetorno disco_grava(Disco* d, char* nomeArquivo); ///nome arquivo deve conter o caminho absoluto ou relativo do arquivo
 TipoRetorno disco_remove(Disco* d, char* nome); ///somente o nome do arquivo sem o caminho
 TipoRetorno disco_recupera(Disco* d, char* nome, FILE* arquivoFisico);
@@ -57,12 +64,6 @@ unsigned long Tamanho_arquivo(char *nomeArquivo);
 
  ///falta essa que recebe o nome do arquivo e atraves do nome busca e grava e mostra se foi possivel
 
-
-typedef enum{
-    SUCESSO = 0,
-    ESPACO_INSUFICIENTE,
-    ARQUIVO_INEXISTENTE
-}TipoRetorno;
 
 
 
@@ -96,11 +97,11 @@ void NoArquivo_adiciona(NoArquivo* Arquivo, char* Nome, unsigned long tam){
 NoArquivo*  NoArquivo_procura(NoArquivo* Arquivo, char* Nome){
   NoArquivo* auxiliar = Arquivo->prox;
 
-  while( (strcmp (aux->nome,Nome)) != 0 ){
+  while( (strcmp (auxiliar->nome,Nome)) != 0 ){
       printf("Procurando");
       auxiliar = auxiliar->prox;
 
-      if(aux == Arquivo) return NULL;
+      if(auxiliar == Arquivo) return NULL;
   }
 
   return auxiliar;
@@ -131,8 +132,8 @@ void adicionar_NoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim)
   NoSetor *comeco=(NoSetor*)malloc(sizeof(NoSetor));
   comeco->inicio=inicio ;
   comeco->fim=fim ;
-  comeco->ant=campo->prox->ant;
-  comeco->prox=campo->prox;
+  comeco->ant=campos->prox->ant;
+  comeco->prox=campos->prox;
   campos->prox->ant =comeco;
   campos->prox=comeco;
    }
@@ -146,8 +147,8 @@ void apagar_NoSetor(NoSetor* campos)
     {
   campos->prox->prox->ant = campos->prox->ant;
   campos->prox = campos->prox->prox;
-  free(ant);
-  free(prox);
+  free(campos->ant);
+  free(campos->prox);
 
     }
 
@@ -166,125 +167,12 @@ unsigned long Tamanho_axrquivo(char* nomeArquivo) {
   return  tamArquivo; /// recebe nome do arquivo e retorna seu tamanho
 }
 
-Disco* disco_cria(char* nome, unsigned long tamanho){
 
-  Disco *d = (Disco*)malloc(sizeof(Disco));
-   strcpy(d->nome, nome); //  cria o disco d nomeia com o nom recebido por parametro
-
-
-  d->disco = (void*)malloc(tamanho) ;
-  d->livres = criar_NoSetor(); //sentinela
-  adiciona_NoSetor(d->livres, 0, tamanho);//Adiciona o Tamanho livre
-
-  d->arquivos = criar_NoArquivo(); //sentinela
-  strcpy(d->arquivos->nome, "Sentinela");
-
-  d->tamDisco = d->espacoLivre = tamanho; //o disco esta completamente vazio para ser inicializado
-
-  d->espacoOcupado = d->qtdeArquivos = 0 // disco vazio = disco sem arquivos;
-
-  return d ;
-  //retorna o disco criado
-}
-
-TipoRetorno disco_grava(Disco* d, char* nomeArquivo){
-
-  int t = 1 ;
-  unsigned long tamRestante = 0;
-
-
-	unsigned long SizeFile = Tamanho_arquivo(nomeArquivo); // pega o tamanho do arquivo e coloca na variavel size file
-
-  FILE* Arquivo = fopen(nomeArquivo, "rb") ; //abre o arquivo
-
-
-	if( SizeFile > ( d->espacoLivre )) return ESPACO_INSUFICIENTE; //Verifica se o tamanho do arquivo é maior que o disco
-
-  adicionar_NoArquivo(d->arquivos, nomeArquivo, SizeFile); //Cria uma struct Arquivo e Aloca dentro de Arquivos
-
-  tamRestante = SizeFile; // quanto falta para colocar no disco
-
-  while(t){
-    adiciona_NoSetor(d->arquivos->prox->setores, 0, 0); // cria um nó em setores no Arquivos
-    editar_NoSetor(d->arquivos->prox->setores, d->livres->prox->inicio, 0); // editar o nó de acordo com o diagrama
-
-    if( ((d->livres->prox->fim) - (d->livres->prox->inicio)) >= tamRes ){ // Verifica se o nó que esta no livres tem espaço suficiente para alocar os bits
-
-      editar_NoSetor(d->arquivos->prox->setores, d->arquivos->prox->setores->prox->inicio, (d->arquivos->prox->setores->prox->inicio)+tamRes);
-
-      if(d->livres->prox->inicio == d->arquivos->prox->setores->prox->inicio ){ // Verificar se é um Nó no Livre que ainda esta 'virgem'
-
-        d->livres->prox->inicio = d->arquivos->prox->setores->prox->fim;
-
-        if(d->livres->prox->inicio == d->livres->prox->fim){// veririca se a capacidade do nó nao esta cheia
-            /* Apagar Nó no Livre, fazer essa função*/
-
-
-          apagar_NoSetor(d->livres);
-        }
-
-      }
-
-      fread(d->disco+(d->arquivos->prox->setores->prox->inicio), (d->arquivos->prox->setores->prox->fim)-(d->arquivos->prox->setores->prox->inicio), 1, Arquivo);
-      d->espacoLivre = d->espacoLivre - SizeFile;
-      d->qtdeArquivos = d->qtdeArquivos + 1 ;
-      tmp = 0;
-
-    }else{
-
-      d->arquivos->prox->setores->prox->fim = d->livres->prox->fim;
-      apagar_NoSetor(d->livres);
-      tamRes = tamRes - ( d->arquivos->prox->setores->prox->fim - d->arquivos->prox->setores->prox->inicio );
-      fread(d->disco+(d->arquivos->prox->setores->prox->inicio), (d->arquivos->prox->setores->prox->fim)-(d->arquivos->prox->setores->prox->inicio), 1, Arquivo);
-
-
-    }
-
-  }
-  fclose(Arquivo);
-  return SUCESSO;
-}
-
-TipoRetorno disco_recupera(Disco* d, char* nome, FILE* arquivoFisico){
-
-  NoArquivo* auxArq = procurar_NoArquivo(d->arquivos, nome);
-  if(auxArq == NULL) return ARQUIVO_INEXISTENTE;
-
-  NoSetor *AuxNo = auxArq->setores->ant;
-
-  while(!(AuxNo == auxArq->setores)){
-    fwrite(d->disco+(AuxNo->inicio), (AuxNo->fim)-(AuxNo->inicio), 1, arquivoFisico);
-    AuxNo = AuxNo->ant;
-  }
-  fclose(arquivoFisico);
-
-  return SUCESSO;
-}
-
-TipoRetorno disco_remove(Disco* d, char* nome){
-
-  NoArquivo* auxArq = procurar_NoArquivo(d->arquivos, nome);
-  if(auxArq == NULL) return ARQUIVO_INEXISTENTE;
-
-  NoSetor *AuxNo = auxArq->setores->ant;
-  while(!(AuxNo == auxArq->setores)){
-
-    AuxNo = setorTolivre(d->livres, AuxNo);
-  }
-
-  d->espacoLivre = d->espacoLivre + (auxArq->tam);
-  apagar_NoArquivo(auxArq->ant);
-  d->qtdeArquivos = d->qtdeArquivos - 1;
-
-  return SUCESSO;
-
-}
-
-TipoRetorno disco_cria(char* nome, unsigned long tamanho){
+TipoRetorno disco_criar(char* nome, unsigned long tamanho){
        Disco* d = (Disco*) malloc(sizeof(Disco));
 
            memcpy(d->nome, nome, sizeof(*nome));
-           int disco[tamanho] = {NULL};
+           int* disco[tamanho] = {NULL};
            d->disco* = disco[tamanho];
            d->tamDisco = tamanho;
            d->espacoLivre = tamanho;
@@ -326,7 +214,97 @@ TipoRetorno disco_cria(char* nome, unsigned long tamanho){
             else return TipoRetorno->ESPACO_INSUFICENTE;
 }
 
+TipoRetorno disco_remove(Disco* d, char* nome){
 
+  NoArquivo* auxArq = procurar_NoArquivo(d->arquivos, nome);
+  if(auxArq == NULL) return ARQUIVO_INEXISTENTE;
+
+  NoSetor *AuxNo = auxArq->setores->ant;
+  while(!(AuxNo == auxArq->setores)){
+
+    AuxNo = setorTolivre(d->livres, AuxNo);
+  }
+
+  d->espacoLivre = d->espacoLivre + (auxArq->tam);
+  apagar_NoArquivo(auxArq->ant);
+  d->qtdeArquivos = d->qtdeArquivos - 1;
+
+  return SUCESSO;
+
+}
+TipoRetorno disco_recupera(Disco* d, char* nome, FILE* arquivoFisico){
+
+  NoArquivo* auxArq = procurar_NoArquivo(d->arquivos, nome);
+  if(auxArq == NULL) return ARQUIVO_INEXISTENTE;
+
+  NoSetor *AuxNo = auxArq->setores->ant;
+
+  while(!(AuxNo == auxArq->setores)){
+    fwrite(d->disco+(AuxNo->inicio), (AuxNo->fim)-(AuxNo->inicio), 1, arquivoFisico);
+    AuxNo = AuxNo->ant;
+  }
+  fclose(arquivoFisico);
+
+  return SUCESSO;
+}
+
+TipoRetorno disco_grava(Disco* d, char* nomeArquivo){
+
+  int t = 1 ;
+  unsigned long tamRestante = 0;
+
+
+	unsigned long SizeFile = Tamanho_arquivo(nomeArquivo); // pega o tamanho do arquivo e coloca na variavel size file
+
+  FILE* Arquivo = fopen(nomeArquivo, "rb") ; //abre o arquivo
+
+
+	if( SizeFile > ( d->espacoLivre )) return ESPACO_INSUFICIENTE; //Verifica se o tamanho do arquivo é maior que o disco
+
+  adicionar_NoArquivo(d->arquivos, nomeArquivo, SizeFile); //Cria uma struct Arquivo e Aloca dentro de Arquivos
+
+  tamRestante = SizeFile; // quanto falta para colocar no disco
+
+  while(t){
+    adiciona_NoSetor(d->arquivos->prox->setores, 0, 0); // cria um nó em setores no Arquivos
+    editar_NoSetor(d->arquivos->prox->setores, d->livres->prox->inicio, 0); // editar o nó de acordo com o diagrama
+
+    if( ((d->livres->prox->fim) - (d->livres->prox->inicio)) >= tamRestante ){ // Verifica se o nó que esta no livres tem espaço suficiente para alocar os bits
+
+      editar_NoSetor(d->arquivos->prox->setores, d->arquivos->prox->setores->prox->inicio, (d->arquivos->prox->setores->prox->inicio)+tamRestante);
+
+      if(d->livres->prox->inicio == d->arquivos->prox->setores->prox->inicio ){ // Verificar se é um Nó no Livre que ainda esta 'virgem'
+
+        d->livres->prox->inicio = d->arquivos->prox->setores->prox->fim;
+
+        if(d->livres->prox->inicio == d->livres->prox->fim){// veririca se a capacidade do nó nao esta cheia
+            /* Apagar Nó no Livre, fazer essa função*/
+
+
+          apagar_NoSetor(d->livres);
+        }
+
+      }
+
+      fread(d->disco+(d->arquivos->prox->setores->prox->inicio), (d->arquivos->prox->setores->prox->fim)-(d->arquivos->prox->setores->prox->inicio), 1, Arquivo);
+      d->espacoLivre = d->espacoLivre - SizeFile;
+      d->qtdeArquivos = d->qtdeArquivos + 1 ;
+      t = 0;
+
+    }else{
+
+      d->arquivos->prox->setores->prox->fim = d->livres->prox->fim;
+      apagar_NoSetor(d->livres);
+      tamRestante = tamRestante - ( d->arquivos->prox->setores->prox->fim - d->arquivos->prox->setores->prox->inicio );
+      fread(d->disco+(d->arquivos->prox->setores->prox->inicio), (d->arquivos->prox->setores->prox->fim)-(d->arquivos->prox->setores->prox->inicio), 1, Arquivo);
+
+
+    }
+
+  }
+  fclose(Arquivo);
+  return SUCESSO;
+}
 
 NoSetor* novoNoSetor(int in, int fim){
          NoSetor* no = malloc(sizeof(NoSetor));
