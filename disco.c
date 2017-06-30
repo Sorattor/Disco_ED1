@@ -12,7 +12,7 @@
      struct nosetor* prox;
      struct nosetor* ant;
 }NoSetor;
-
+//funcoes   :
 NoSetor* valorsetor();//valor que indica o proximo e anterior da seqüência de dados, utulizado sentinela
 void inserirNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//o campo nessa funçao insere o elemeno no inicio e no fim.
 void editarNoSetor(NoSetor* campos, unsigned long inicio, unsigned long fim);//funçao para editar o começo e o fim.
@@ -27,7 +27,7 @@ typedef struct noarquivo{
     struct noarquivo* prox;
     struct noarquivo* ant;
 }NoArquivo;
-
+//funcoes   :
 //cria adiciona e procura arquivo, alem de apagar
 NoArquivo* NoArquivo_cria();
 void NoArquivo_adiciona (NoArquivo* Arquivo, char* Nome, unsigned long tam);
@@ -45,6 +45,13 @@ typedef struct{
     unsigned long espacoOcupado;
     unsigned long qtdeArquivos;   
 }Disco;
+
+//funcoes   :
+TipoRetorno disco_cria(char* nome, unsigned long tamanho);
+Disco * insereNoSetor(NoSetor* no, Disco* d, int posicao);
+Disco * insereNoArquivo(NoArquivo* noarq, Disco* d, int posicao); ///falta esssa tambem
+TipoRetorno disco_grava(Disco* d, char* arquivo); ///falta essa que recebe o nome do arquivo e atraves do nome busca e grava e mostra se foi possivel
+
  
 typedef enum{
     SUCESSO = 0,
@@ -52,10 +59,7 @@ typedef enum{
     ARQUIVO_INEXISTENTE
 }TipoRetorno;
 
- //FUNCOES TAD
-
-
-
+//funcoes
 
 
  ///Implementação da TAD ARQUIVO
@@ -64,7 +68,9 @@ NoArquivo* NoArquivo_cria (){
 	NoArquivo* A = (NoArquivo*) malloc (sizeof(NoArquivo)) ;
 	A->prox = A;
 	A->ant = A;
-    return A;}
+    return A ;
+
+    }
 
 void NoArquivo_adiciona(NoArquivo* Arquivo, char* Nome, unsigned long tam){
 
@@ -246,7 +252,7 @@ Disco * insereNoSetor(NoSetor* no, Disco* d, int posicao){
 
             return d;
 }
-Disco * insereNoArquivo(NoArquivo* noarq, Disco* d, int posicao){}
+Disco * insereNoArquivo(NoArquivo* noarq, Disco* d, int posicao){
 
 
          *d->livres->prox = no;
@@ -262,4 +268,4 @@ Disco * insereNoArquivo(NoArquivo* noarq, Disco* d, int posicao){}
 //fwrite para escrever blocos de bites com qualquer tipo
 //int fwrite(void* buffer, int bytes, int count, FILE f);
 
-TipoRetorno disco_grava(Disco* d, char* arquivo); //nome arquivo deve contera
+
